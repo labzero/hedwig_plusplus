@@ -1,0 +1,2 @@
+%{"hedwig": {:hex, :hedwig, "1.0.0", "effbb160b9b270cb62ac1b2d6041b4ac731a21b0fc048dd2c35840245fdc0f22", [:mix], []},
+  "hedwig_brain": {:git, "git@github.com:labzero/hedwig_brain.git", "bb7abf876fa82a0cfcd6f4783ac943d390b7bc80", []}}
