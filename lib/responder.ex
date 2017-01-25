@@ -40,6 +40,10 @@ defmodule HedwigPlusPlus.Responder do
   defmodule Score do
     defstruct score: 0, reasons: %{}
 
+    def new(score, delta) do
+      %Score{score | score: score.score + delta}
+    end
+
     def increment(score) do
       %Score{score| score: score.score + 1}
     end
@@ -53,9 +57,9 @@ defmodule HedwigPlusPlus.Responder do
       score
     end
 
-    # add a reason to the map with an initial # of points of 0
-    def add_reason(%Score{reasons: reasons} = score, reason) do
-      updater = fn val -> if val == nil, do: {val, 1}, else: {val, val + 1} end
+    # add a reason to the map with an initial # of points of 1
+    def add_reason(%Score{reasons: reasons} = score, reason, delta) do
+      updater = fn val -> if val == nil, do: {val, delta}, else: {val, val + delta} end
       {_, updated_reasons} = Map.get_and_update(reasons, HedwigPlusPlus.Responder.Scoreboard.canonicalize(reason), updater)
       %Score{score | reasons: updated_reasons}      
     end
@@ -156,14 +160,14 @@ defmodule HedwigPlusPlus.Responder do
 
   hear ~r/^(?<name>[\w\S]+)([\W\s]*)\s*(?<op>\+\+|--|—)(?:\s+(?:for|because|cause|cuz|as)\s+(?<reason>.+))?$/ui, message do
     %{"name" => name, "op" => op, "reason" => reason} = message.matches
-    data = Scoreboard.data_for(name)
-    score = case op do
-      "++" -> Score.increment(data)
-      "--" -> Score.decrement(data)
-    end 
-    score =    
-      score
-      |> Score.add_reason(reason)
+    delta = case op do
+      "++" -> 1
+      "--" -> -1
+    end
+    score = 
+      Scoreboard.data_for(name)
+      |> Score.new(delta)   
+      |> Score.add_reason(reason, delta)
       |> Scoreboard.save(name)
     {message_reason, message_increment} = if reason == "" do
       case Score.random_reason(score) do

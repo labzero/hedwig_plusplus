@@ -54,25 +54,38 @@ defmodule ResponderTest do
     end
 
     test "a new reason can be added to a Score" do
-      score = Score.add_reason(%Score{}, "stuff")
+      score = Score.add_reason(%Score{}, "stuff", 1)
       assert Map.get(score.reasons, "stuff") == 1
     end
+
+    test "a new reason can be added to a Score with a negative" do
+      score = Score.add_reason(%Score{}, "stuff", -1)
+      assert Map.get(score.reasons, "stuff") == -1
+    end    
 
     test "multiple occurences of a reason are counted" do
       score =
         %Score{}
-        |> Score.add_reason("stuff")
-        |> Score.add_reason("stuff")
+        |> Score.add_reason("stuff", 1)
+        |> Score.add_reason("stuff", 1)
       assert Map.get(score.reasons, "stuff") == 2 
     end 
-    
-    test "best reason will give you the reson with the most points" do
+
+    test "multiple occurences of a reason are counted even if some are negative" do
       score =
         %Score{}
-        |> Score.add_reason("reason 1")
-        |> Score.add_reason("reason 2")
-        |> Score.add_reason("reason 3")
-        |> Score.add_reason("reason 3")
+        |> Score.add_reason("stuff", 1)
+        |> Score.add_reason("stuff", -1)
+      assert Map.get(score.reasons, "stuff") == 0
+    end     
+    
+    test "best reason will give you the reason with the most points" do
+      score =
+        %Score{}
+        |> Score.add_reason("reason 1", 1)
+        |> Score.add_reason("reason 2", 1)
+        |> Score.add_reason("reason 3", 1)
+        |> Score.add_reason("reason 3", 1)
       assert Score.best_reason(score) == {"reason 3", 2}    
     end
   end
