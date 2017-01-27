@@ -158,7 +158,7 @@ defmodule HedwigPlusPlus.Responder do
    hubot bottom <amount>     
   """
 
-  hear ~r/^(?<name>(?:\S+\s*?)+)\s*(?<op>\+\+|--|—)(?:\s+(?:for|because|cause|cuz|as)\s+(?<reason>.+?)\s*)?$/ui, message do
+  hear ~r/^(?<name>(?:(?:\S(?<!\+\+|--|—))+\s*?)+)\s*(?<op>\+\+|--|—)(?:\s+(?:for|because|cause|cuz|as)\s+(?<reason>.+?)\s*)?\s*$/ui, message do
     %{"name" => name, "op" => op, "reason" => reason} = message.matches
     delta = case op do
       "++" -> 1
